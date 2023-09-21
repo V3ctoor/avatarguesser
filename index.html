@@ -823,17 +823,21 @@
         }
 
         function checkGuess(guess) {
-            if (guess === currentEpisode) {
-                score++;
-                showRandomImage();
-            } else if (guess !== "") {
-                score = 0;
-                document.getElementById('guess-input').style.display = 'none';
-                document.getElementById('guess-button').style.display = 'none';
-                document.getElementById('try-again-button').style.display = 'block';
-                document.getElementById('feedback').innerText = "Good try, but no. It was " + currentEpisode + ".";
+            if (Object.keys(episodes).includes(guess)) { // Check if the guess is in the list of episode names
+                if (guess === currentEpisode) {
+                    score++;
+                    showRandomImage();
+                } else {
+                    score = 0;
+                    document.getElementById('guess-input').style.display = 'none';
+                    document.getElementById('guess-button').style.display = 'none';
+                    document.getElementById('try-again-button').style.display = 'block';
+                    document.getElementById('feedback').innerText = "Good try, but no. It was " + currentEpisode + ".";
+                }
+                document.getElementById('score').innerText = "Score: " + score;
+            } else {
+                alert("Please select an episode from the list.");
             }
-            document.getElementById('score').innerText = "Score: " + score;
         }
 
         function resetGame() {
