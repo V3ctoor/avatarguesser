@@ -828,7 +828,6 @@
                     score++;
                     showRandomImage();
                 } else {
-                    score = 0;
                     document.getElementById('guess-input').style.display = 'none';
                     document.getElementById('guess-button').style.display = 'none';
                     document.getElementById('try-again-button').style.display = 'block';
@@ -841,6 +840,7 @@
         }
 
         function resetGame() {
+            score = 0; // reset the score when "Try Again" is clicked
             showRandomImage();
             document.getElementById('score').innerText = "Score: " + score;
         }
