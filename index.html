@@ -34,6 +34,16 @@
             display: block;
             margin: 0 auto;
         }
+
+        #try-again-button {
+            display: none;
+            margin: 0 auto;
+        }
+
+        #feedback {
+            text-align: center;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
@@ -41,10 +51,12 @@
     <div id="filename"></div>
     <input id="guess-input" list="episode-names" placeholder="Guess the episode name...">
     <button id="guess-button" onclick="checkGuess(document.getElementById('guess-input').value)">Guess</button>
+    <button id="try-again-button" onclick="resetGame()">Try Again</button>
     <datalist id="episode-names">
         <!-- JavaScript will populate this with the episode names -->
     </datalist>
     <div id="score">Score: 0</div>
+    <div id="feedback"></div>
 
     <script>
         let episodes = {
@@ -804,6 +816,10 @@
 
             document.getElementById('image-container').style.backgroundImage = 'url("' + encodedImage + '")';
             document.getElementById('guess-input').value = "";
+            document.getElementById('guess-input').style.display = 'block';
+            document.getElementById('guess-button').style.display = 'block';
+            document.getElementById('try-again-button').style.display = 'none';
+            document.getElementById('feedback').innerText = '';
         }
 
         function checkGuess(guess) {
@@ -812,7 +828,16 @@
                 showRandomImage();
             } else if (guess !== "") {
                 score = 0;
+                document.getElementById('guess-input').style.display = 'none';
+                document.getElementById('guess-button').style.display = 'none';
+                document.getElementById('try-again-button').style.display = 'block';
+                document.getElementById('feedback').innerText = "Good try, but no. It was " + currentEpisode + ".";
             }
+            document.getElementById('score').innerText = "Score: " + score;
+        }
+
+        function resetGame() {
+            showRandomImage();
             document.getElementById('score').innerText = "Score: " + score;
         }
 
