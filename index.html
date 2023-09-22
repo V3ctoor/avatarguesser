@@ -61,7 +61,7 @@
 <body>
     <div id="image-container"></div>
     <div id="filename"></div>
-    <input id="guess-input" list="episode-names" placeholder="Guess the episode name...">
+    <input id="guess-input" list="episode-names" placeholder="Guess the episode name..." onkeypress="handleKeyPress(event)">
     <button id="guess-button" onclick="checkGuess(document.getElementById('guess-input').value)">Guess</button>
     <button id="try-again-button" onclick="resetGame()">Try Again</button>
     <datalist id="episode-names">
@@ -108,6 +108,11 @@
             document.getElementById('guess-button').style.display = 'block';
             document.getElementById('try-again-button').style.display = 'none';
             document.getElementById('feedback').innerText = '';
+        }
+        function handleKeyPress(event) {
+            if (event.keyCode === 13) { // Check if the key pressed was Enter
+                checkGuess(document.getElementById('guess-input').value);
+            }
         }
 
         function checkGuess(guess) {
