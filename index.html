@@ -74,6 +74,8 @@
         let episodes = {};
         let score = 0;
         let currentEpisode = "";
+        let sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // Generate a session ID
+        let endpoint = 'https://script.google.com/macros/s/AKfycbxZkwBD-z0SYKzu4WKJ06UCdLXSpVUXCjomLzlD8x8XEmAJxrjo225DaATcfz0EEoxg/exec'; // Replace with the URL of your Apps Script web app
 
         // Fetch the episode data from the JSON file
         fetch('episodes.json')
@@ -116,7 +118,7 @@
         }
 
         function checkGuess(guess) {
-            if (Object.keys(episodes).includes(guess)) { // Check if the guess is in the list of episode names
+            if (Object.keys(episodes).includes(guess)) { 
                 if (guess === currentEpisode) {
                     score++;
                     showRandomImage();
@@ -130,6 +132,25 @@
             } else {
                 alert("Please select an episode from the list.");
             }
+            sendDataToGoogleSheet();
+        }
+
+        function sendDataToGoogleSheet() {
+            fetch(endpoint, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionId: sessionId,
+                    score: score,
+                    imageLoaded: document.getElementById('image-container').style.backgroundImage
+                })
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
         }
 
         function resetGame() {
