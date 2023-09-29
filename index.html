@@ -5,56 +5,55 @@
 
     <style>
         #image-container {
+            display: flex;
             width: 100%;
-            height: 500px;
-            border: 1px solid #000;
+            height: 60vh; /* Adjust this value as needed */
+            border: none;
             margin: 0 auto;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
+            justify-content: center;
+            align-items: center;
+            background-size: contain; /* This will prevent the image from being stretched */
+            background-position: center; /* This will center the image */
+            background-repeat: no-repeat; /* This will prevent the image from repeating */
         }
 
-        #filename {
+        #image-container img {
+            width: 100%; /* This will make the image take up the entire width */
+            height: auto;
+            object-fit: contain; /* This will prevent the image from being stretched */
+        }
+
+        #filename,
+        #score,
+        #feedback {
             text-align: center;
             margin: 10px auto;
+            font-size: 1.5em;
         }
 
         #guess-input {
             display: block;
             width: 400px;
             margin: 20px auto;
-        }
-
-        #score {
-            text-align: center;
-            margin: 10px auto;
+            padding: 10px;
             font-size: 1.5em;
         }
 
-        #guess-button {
+        #guess-button,
+        #try-again-button {
             display: block;
             margin: 0 auto;
-        }
-
-        #try-again-button {
-            display: none;
-            margin: 0 auto;
-        }
-
-        #feedback {
-            text-align: center;
-            margin: 20px auto;
-            font-size: 1.5em;
-        }
-
-        #guess-button, #try-again-button {
             padding: 20px 40px;
             font-size: 1.5em;
         }
 
-        #guess-input {
-            padding: 10px;
-            font-size: 1.5em;
+        @media (max-aspect-ratio: 3/2) {
+            #image-container {
+                width: 100%;
+                height: 0;
+                padding-top: 57%; /* Adjust this value as needed */
+                background-size: 100% auto;
+            }
         }
     </style>
 </head>
