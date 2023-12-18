@@ -75,11 +75,10 @@
 
     <script>
         let episodes = {};
-        let failedAttempts = 0;
         let score = 0;
         let currentEpisode = "";
         let sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // Generate a session ID
-        let endpoint = 'https://script.google.com/macros/s/AKfycbwYm7u2mbDYMMVNOFybBVuQFddzRJiLwdPU2sjn31h-kGu6Y9jHv3acJGpVx0Roj3jh/exec'; // Replace with the URL of your Apps Script web app
+        let endpoint = 'https://script.google.com/macros/s/AKfycbzyCooOubkArjkVytqpxwbh4EQBWpFf5EY21QdIhQbeE8lJ2PjrPRk9lCvflzhKj0II/exec'; // Replace with the URL of your Apps Script web app
 
         // Fetch the episode data from the JSON file
         fetch('episodes.json')
@@ -139,37 +138,23 @@
             sendDataToGoogleSheet();
         }
 
-
         function sendDataToGoogleSheet() {
             fetch(endpoint, {
                 method: 'POST',
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     sessionId: sessionId,
                     score: score,
-                    imageLoaded: document.getElementById('image-container').style.backgroundImage,
-                    failedAttempts: failedAttempts
+                    imageLoaded: document.getElementById('image-container').style.backgroundImage
                 })
-            })
-            .then(response => {
-                if (response.ok) {
-                    failedAttempts = 0; // Reset the counter on successful transmission
-                    return response.json(); // Assuming the server sends a JSON response
-                } else {
-                    throw new Error('Network response was not ok.');
-                }
-            })
-            .then(data => {
-                console.log('Success:', data);
             })
             .catch((error) => {
                 console.error('Error:', error);
-                failedAttempts++; // Increment the counter on a failed transmission
             });
         }
-
 
         function resetGame() {
             score = 0; // reset the score when "Try Again" is clicked
