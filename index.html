@@ -75,10 +75,11 @@
 
     <script>
         let episodes = {};
+        let failedAttempts = 0;
         let score = 0;
         let currentEpisode = "";
         let sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // Generate a session ID
-        let endpoint = 'https://script.google.com/macros/s/AKfycbwmuB2tf4wDpLJtakDPqL5h49aR5OzKAlj6_crlF-_fgKSuLOGnDSYlu6zQB3KFWkAW/exec'; // Replace with the URL of your Apps Script web app
+        let endpoint = 'https://script.google.com/macros/s/AKfycbz_cljWBDt9CyQTLhXN7Z-2CIULR_Jkc1zhT6b1B46hzdgGgc-yy-afDVHR_zQyjUg_/exec'; // Replace with the URL of your Apps Script web app
 
         // Fetch the episode data from the JSON file
         fetch('episodes.json')
@@ -138,6 +139,7 @@
             sendDataToGoogleSheet();
         }
 
+
         function sendDataToGoogleSheet() {
             fetch(endpoint, {
                 method: 'POST',
@@ -148,11 +150,20 @@
                 body: JSON.stringify({
                     sessionId: sessionId,
                     score: score,
-                    imageLoaded: document.getElementById('image-container').style.backgroundImage
+                    imageLoaded: document.getElementById('image-container').style.backgroundImage,
+                    failedAttempts: failedAttempts // include the count of failed attempts
                 })
+            })
+            .then(response => {
+                if (response.ok) {
+                    failedAttempts = 0; // reset the counter on successful transmission
+                } else {
+                    throw new Error('Network response was not ok.');
+                }
             })
             .catch((error) => {
                 console.error('Error:', error);
+                failedAttempts++; // increment the counter on a failed transmission
             });
         }
 
