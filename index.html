@@ -25,6 +25,7 @@
 
         #filename,
         #score,
+        #high-score,
         #feedback {
             text-align: center;
             margin: 10px auto;
@@ -62,26 +63,27 @@
     </style>
 </head>
 <body>
-    <div id="image-container"></div>
-    <div id="filename"></div>
-    <input id="guess-input" list="episode-names" placeholder="Guess the episode..." onkeypress="handleKeyPress(event)">
-    <button id="guess-button" onclick="checkGuess(document.getElementById('guess-input').value)">Guess</button>
-    <button id="try-again-button" onclick="resetGame()">Try Again</button>
-    <datalist id="episode-names">
-        <!-- JavaScript will populate this with the episode names -->
-    </datalist>
-    <div id="score">Score: 0</div>
-    <div id="feedback"></div>
+<div id="image-container"></div>
+<div id="filename"></div>
+<input id="guess-input" list="episode-names" placeholder="Guess the episode..." onkeypress="handleKeyPress(event)">
+<button id="guess-button" onclick="checkGuess(document.getElementById('guess-input').value)">Guess</button>
+<button id="try-again-button" onclick="resetGame()">Try Again</button>
+<datalist id="episode-names">
+    <!-- JavaScript will populate this with the episode names -->
+</datalist>
+<div id="score">Score: 0</div>
+<div id="high-score">High Score: 0</div>
+<div id="feedback"></div>
 
-    <script>
-        let episodes = {};
-        let score = 0;
-        let currentEpisode = "";
-        let sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // Generate a session ID
-        let endpoint = 'https://script.google.com/macros/s/AKfycbzyCooOubkArjkVytqpxwbh4EQBWpFf5EY21QdIhQbeE8lJ2PjrPRk9lCvflzhKj0II/exec'; // Replace with the URL of your Apps Script web app
+<script>
+    let episodes = {};
+    let score = 0;
+    let currentEpisode = "";
+    let sessionId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // Generate a session ID
+    let endpoint = 'https://script.google.com/macros/s/AKfycbzyCooOubkArjkVytqpxwbh4EQBWpFf5EY21QdIhQbeE8lJ2PjrPRk9lCvflzhKj0II/exec'; // Replace with the URL of your Apps Script web app
 
-        // Fetch the episode data from the JSON file
-        fetch('episodes.json')
+    // Fetch the episode data from the JSON file
+    fetch('episodes.json')
         .then(response => response.json())
         .then(data => {
             episodes = data;
@@ -94,73 +96,99 @@
                 datalist.appendChild(option);
             }
 
+            checkHighScore();
             showRandomImage(); // show a random image immediately when the data is loaded
         });
 
-        function showRandomImage() {
-            let episodeNames = Object.keys(episodes);
-            let randomEpisodeIndex = Math.floor(Math.random() * episodeNames.length);
-            currentEpisode = episodeNames[randomEpisodeIndex];
-            
-            let images = episodes[currentEpisode];
-            let randomImageIndex = Math.floor(Math.random() * images.length);
-            let randomImage = images[randomImageIndex];
-            let encodedImage = encodeURI('randomframes/' + randomImage);
+    function showRandomImage() {
+        let episodeNames = Object.keys(episodes);
+        let randomEpisodeIndex = Math.floor(Math.random() * episodeNames.length);
+        currentEpisode = episodeNames[randomEpisodeIndex];
 
-            document.getElementById('image-container').style.backgroundImage = 'url("' + encodedImage + '")';
-            document.getElementById('guess-input').value = "";
-            document.getElementById('guess-input').style.display = 'block';
-            document.getElementById('guess-button').style.display = 'block';
-            document.getElementById('try-again-button').style.display = 'none';
-            document.getElementById('feedback').innerText = '';
-        }
-        function handleKeyPress(event) {
-            if (event.keyCode === 13) { // Check if the key pressed was Enter
-                checkGuess(document.getElementById('guess-input').value);
-            }
-        }
+        let images = episodes[currentEpisode];
+        let randomImageIndex = Math.floor(Math.random() * images.length);
+        let randomImage = images[randomImageIndex];
+        let encodedImage = encodeURI('randomframes/' + randomImage);
 
-        function checkGuess(guess) {
-            if (Object.keys(episodes).includes(guess)) { 
-                if (guess === currentEpisode) {
-                    score++;
-                    showRandomImage();
-                } else {
-                    document.getElementById('guess-input').style.display = 'none';
-                    document.getElementById('guess-button').style.display = 'none';
-                    document.getElementById('try-again-button').style.display = 'block';
-                    document.getElementById('feedback').innerText = "Good try, but no. It was " + currentEpisode + ".";
-                }
-                document.getElementById('score').innerText = "Score: " + score;
+        document.getElementById('image-container').style.backgroundImage = 'url("' + encodedImage + '")';
+        document.getElementById('guess-input').value = "";
+        document.getElementById('guess-input').style.display = 'block';
+        document.getElementById('guess-button').style.display = 'block';
+        document.getElementById('try-again-button').style.display = 'none';
+        document.getElementById('feedback').innerText = '';
+    }
+    function handleKeyPress(event) {
+        if (event.keyCode === 13) { // Check if the key pressed was Enter
+            checkGuess(document.getElementById('guess-input').value);
+        }
+    }
+
+    function checkGuess(guess) {
+        if (Object.keys(episodes).includes(guess)) {
+            if (guess === currentEpisode) {
+                score++;
+                showRandomImage();
             } else {
-                alert("Please select an episode from the list.");
+                document.getElementById('guess-input').style.display = 'none';
+                document.getElementById('guess-button').style.display = 'none';
+                document.getElementById('try-again-button').style.display = 'block';
+                document.getElementById('feedback').innerText = "Good try, but no. It was " + currentEpisode + ".";
             }
-            sendDataToGoogleSheet();
+            document.getElementById('score').innerText = "Score: " + score;
+        } else {
+            alert("Please select an episode from the list.");
+        }
+        checkHighScore();
+        sendDataToGoogleSheet();
+    }
+
+    function setHighScore(newScore, isHigher) {
+        document.getElementById('high-score').innerText = 'High Score: ' + newScore;
+        window.localStorage.setItem('high-score', newScore);
+
+        if (isHigher) {
+            document.getElementById('high-score').style.color = 'red';
+        }
+    }
+
+    function checkHighScore() {
+        const currentHighScore = Number(window.localStorage.getItem('high-score'));
+
+        setHighScore(currentHighScore);
+
+        if (score > currentHighScore) {
+            return setHighScore(score, true);
         }
 
-        function sendDataToGoogleSheet() {
-            fetch(endpoint, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    sessionId: sessionId,
-                    score: score,
-                    imageLoaded: document.getElementById('image-container').style.backgroundImage
-                })
+        if (!currentHighScore) {
+            return setHighScore(score)
+        }
+    }
+
+    function sendDataToGoogleSheet() {
+        fetch(endpoint, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sessionId: sessionId,
+                score: score,
+                imageLoaded: document.getElementById('image-container').style.backgroundImage
             })
+        })
             .catch((error) => {
                 console.error('Error:', error);
             });
-        }
+    }
 
-        function resetGame() {
-            score = 0; // reset the score when "Try Again" is clicked
-            showRandomImage();
-            document.getElementById('score').innerText = "Score: " + score;
-        }
-    </script>
+    function resetGame() {
+        score = 0; // reset the score when "Try Again" is clicked
+        showRandomImage();
+        document.getElementById('score').innerText = "Score: " + score;
+        document.getElementById('high-score').style.color = "#000";
+    }
+</script>
 </body>
 </html>
