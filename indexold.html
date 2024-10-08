@@ -65,7 +65,7 @@
 <body>
 <div id="image-container"></div>
 <div id="filename"></div>
-<input id="guess-input" list="episode-names" placeholder="Guess the episode..." onkeypress="handleKeyPress(event)">
+<input id="guess-input" list="episode-names" placeholder="Guess the episode (name or number)..." onkeypress="handleKeyPress(event)">
 <button id="guess-button" onclick="checkGuess(document.getElementById('guess-input').value)">Guess</button>
 <button id="try-again-button" onclick="resetGame()">Try Again</button>
 <datalist id="episode-names">
@@ -122,8 +122,20 @@
         }
     }
 
+    function getGuessValue(guess) {
+      if (Object.keys(episodes).includes(guess)) return guess;
+      
+      const guessAsIndex = parseInt(guess);
+      if (1 <= guessAsIndex && guessAsIndex <= Object.keys(episodes).length) {
+        return Object.keys(episodes)[guessAsIndex - 1];
+      }
+      
+      return undefined;
+    }
+    
     function checkGuess(guess) {
-        if (Object.keys(episodes).includes(guess)) {
+        guess = getGuessValue(guess);
+        if (guess !== undefined) {
             if (guess === currentEpisode) {
                 score++;
                 showRandomImage();
